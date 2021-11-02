@@ -1,6 +1,6 @@
-# TensorFlow2 AdaIN implementation 
+# TensorFlow2 AdaIN Implementation 
 This is an implementation of [AdaIN](https://arxiv.org/abs/1703.06868) paper in TensorFlow 2. The script contains only the training algorithm.
-# How to use it.
+# How to use it
 1. Download vgg19 normalized from [here](https://github.com/elleryqueenhomels/arbitrary_style_transfer)
 
 2. Insert the paths to wikiart and train2014 datasets or other datasets.
