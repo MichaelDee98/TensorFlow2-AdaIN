@@ -131,23 +131,23 @@ def decode_img(img, reverse_channels=False):
   img = tf.cast(img, dtype=tf.uint8)
   return img
 
-#style_path ="/home/litsos/style_transfer/dataset/wikiart" #"/home/michlist/Desktop/Style_Transfer/Tensorflow2_Style_Transfer/dataset"
-#content_path = "/home/litsos/style_transfer/dataset/train2014"
+#style_path = enter your style path
+#content_path = enter your content path
 
 """##Dataset"""
 
-#style_train_ds = prepare_dataset(style_path + '/**/*.jpg')
+style_train_ds = prepare_dataset(style_path + '/**/*.jpg')
 
-#content_train_ds = prepare_dataset(content_path + '/*.jpg')
+content_train_ds = prepare_dataset(content_path + '/*.jpg')
 
-#print(f"Style images {len(style_train_ds)}")
+print(f"Style images {len(style_train_ds)}")
 
-#print(f"Contain images {len(content_train_ds)}")
+print(f"Contain images {len(content_train_ds)}")
 
-#train_ds = tf.data.Dataset.zip((style_train_ds, content_train_ds))
-#train_ds = train_ds.shuffle(BATCH_SIZE).batch(BATCH_SIZE).prefetch(tf.data.experimental.AUTOTUNE)
+train_ds = tf.data.Dataset.zip((style_train_ds, content_train_ds))
+train_ds = train_ds.shuffle(BATCH_SIZE).batch(BATCH_SIZE).prefetch(tf.data.experimental.AUTOTUNE)
 
-#print(f"Final train dataset {len(train_ds)}")
+print(f"Final train dataset {len(train_ds)}")
 
 """#Networks"""
 
@@ -390,32 +390,6 @@ learning_rate = tf.keras.optimizers.schedules.InverseTimeDecay(LEARNING_RATE, DE
 optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 train_loss = tf.keras.metrics.Mean(name='train_loss')
 
-'''
-style_tr, content_tr = next(iter(train_ds))
-style_tr = tf.reverse(style_tr, axis=[-1])
-style_tr = preprocess(style_tr)
-content_tr = tf.reverse(content_tr, axis=[-1])
-content_tr = preprocess(content_tr)
-'''
-
-'''
-with tf.GradientTape() as tape:
-  encoded_content = encoder[-1](content_tr)
-  encoded_style = encoder[-1](style_tr)
-
-  adain_output = adaptive_instance_normalization(encoded_content , encoded_style)
-  target_img = decoder(adain_output)
-
-  target_img = deprocess(target_img)
-  target_img = tf.reverse(target_img, axis=[-1])
-  target_img = tf.clip_by_value(target_img, 0.0, 255.0)
-
-  loss = get_loss(adain_output, style_tr, target_img)
-
-gradients = tape.gradient(loss, decoder.trainable_variables)
-optimizer.apply_gradients(zip(gradients, decoder.trainable_variables))
-'''
-'''
 EPOCHS = 4
 PROGBAR = tf.keras.utils.Progbar(len(train_ds))
 for epoch in range(EPOCHS):
@@ -446,55 +420,3 @@ for epoch in range(EPOCHS):
                         train_loss.result()))
 
 decoder.save_weights("./weights/git/decoder")
-'''
-
-style = load_img_Inference("/home/litsos/style_transfer/style_images/a-muse-1935.jpg")
-style*=255
-style = tf.reverse(style, axis=[-1])
-style = preprocess(style)
-decoder.load_weights("/home/litsos/style_transfer/AdaIN/weights/git/decoder")
-content_images_names = os.listdir("/home/litsos/style_transfer/dataset/train2014/")
-metrics = []
-
-for _ in range(100):
-  index = random.randint(1, 800)
-  content = load_img_Inference("/home/litsos/style_transfer/dataset/train2014/"+content_images_names[index])
-  
-  content*=255
-  #style1 = load_img_Inference("/content/drive/MyDrive/content_images/Wikiart/Action_painting/hans-hofmann_the-wind-1942.jpg")
-  #content1 = load_img_Inference("/content/drive/MyDrive/content_images/mini_batch/000000000802.jpg")
-
-
-
-
-  content = tf.reverse(content, axis=[-1])
-  content = preprocess(content)
-
-
-
-  start = time.time()
-  encoded_content = encoder[-1](content)
-  encoded_style = encoder[-1](style)
-
-
-
-  adain_output = adaptive_instance_normalization(encoded_style, encoded_content)
-
-  #start = time.time()
-  target_img = decoder(adain_output)
-  end = time.time()
-  print(f"Inference time = {end-start}")
-  metrics.append(end-start)
-  start = time.time()
-  target_img = deprocess(target_img)
-  target_img = tf.reverse(target_img, axis=[-1])
-  target_img = tf.clip_by_value(target_img, 0.0, 255.0)
-  end=time.time()
-  print(f"Post Process time = {end-start}")
-#tensor_to_image(content)
-print(f"Metrics average time {tf.reduce_mean(metrics)}")
-#tensor_to_image(style)
-
-#target_img
-
-#tensor_to_image(target_img/255)
