@@ -31,7 +31,9 @@ DECAY_STEPS = 1.0
 STYLE_LOSS_WEIGHT = 2
 ###################################
 
-######## Utility Functions ########
+######## Utility Functions ######## 
+# These functions could be in another module so we can have a cleaner code. 
+# But it's ok for testing purposes. 
 
 # Subtracting the dataset's mean from the channels
 def preprocess(image, mode='BGR'):
